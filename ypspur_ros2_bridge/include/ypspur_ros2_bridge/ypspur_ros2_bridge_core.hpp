@@ -12,6 +12,7 @@
 #include <sensor_msgs/msg/joint_state.hpp>
 
 #include <string.h>
+#include "tf2_ros/transform_broadcaster.h"
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <ypspur.h>
@@ -48,6 +49,7 @@ private:
   double angular_acc_max_;
 
   double pub_hz_;
+  bool use_odom_tf_;
   sensor_msgs::msg::JointState js_;
 
   std::string left_wheel_joint_;
@@ -62,4 +64,6 @@ private:
   rclcpp_lifecycle::LifecyclePublisher<geometry_msgs::msg::PoseStamped>::SharedPtr pose_pub_;
   rclcpp_lifecycle::LifecyclePublisher<sensor_msgs::msg::JointState>::SharedPtr js_pub_;
   rclcpp::TimerBase::SharedPtr timer_control_;
+
+  tf2_ros::TransformBroadcaster tf2_broadcaster_;
 };

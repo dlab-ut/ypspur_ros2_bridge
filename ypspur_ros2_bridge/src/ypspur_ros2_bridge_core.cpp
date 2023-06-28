@@ -1,7 +1,7 @@
 #include "ypspur_ros2_bridge/ypspur_ros2_bridge_core.hpp"
 
 YpspurROS2Bridge::YpspurROS2Bridge()
-: rclcpp_lifecycle::LifecycleNode("ypspur_ros2_bridge")
+: rclcpp_lifecycle::LifecycleNode("ypspur_ros2_bridge"), tf2_broadcaster_(*this)
 {
  declareParams(); 
 }
@@ -21,6 +21,7 @@ void YpspurROS2Bridge::declareParams()
   linear_acc_max_ = this->declare_parameter<double>("linear_acc_max", 1.0);
   angular_acc_max_ = this->declare_parameter<double>("angular_acc_max", M_PI);
   pub_hz_ = this->declare_parameter<double>("pub_hz_", 25.0);
+  use_odom_tf_ = this->declare_parameter<bool>("use_odom_tf", false);
 }
 
 void YpspurROS2Bridge::getParams()
@@ -37,6 +38,7 @@ void YpspurROS2Bridge::getParams()
   this->get_parameter("linear_acc_max", linear_acc_max_);
   this->get_parameter("angular_acc_max", angular_acc_max_);
   this->get_parameter("pub_hz_", pub_hz_);
+  this->get_parameter("use_odom_tf", use_odom_tf_);
 }
 
 CallbackReturn YpspurROS2Bridge::on_configure(const rclcpp_lifecycle::State & previous_state)
@@ -133,7 +135,7 @@ void YpspurROS2Bridge::CmdVelCallback(const geometry_msgs::msg::Twist::ConstShar
 void YpspurROS2Bridge::timerCallback()
 {
   geometry_msgs::msg::Quaternion odom_quat;
-  geometry_msgs::msg::TransformStamped odom_trans;
+  geometry_msgs::msg::TransformStamped odom_tf;
   nav_msgs::msg::Odometry odom;
   geometry_msgs::msg::TwistStamped twist_stamped;
   geometry_msgs::msg::PoseStamped pose_stamped;
@@ -155,13 +157,16 @@ void YpspurROS2Bridge::timerCallback()
   yp_quat.setRPY(0, 0, th);
   odom_quat = tf2::toMsg(yp_quat);
 
-  odom_trans.header.stamp = ros_clock.now();
-  odom_trans.header.frame_id = frame_id_;
-  odom_trans.child_frame_id = child_frame_id_;
-  odom_trans.transform.translation.x = x;
-  odom_trans.transform.translation.y = y;
-  odom_trans.transform.translation.z = 0.0;
-  odom_trans.transform.rotation = odom_quat;
+  if(use_odom_tf_){
+    odom_tf.header.stamp = ros_clock.now();
+    odom_tf.header.frame_id = frame_id_;
+    odom_tf.child_frame_id = child_frame_id_;
+    odom_tf.transform.translation.x = x;
+    odom_tf.transform.translation.y = y;
+    odom_tf.transform.translation.z = 0.0;
+    odom_tf.transform.rotation = odom_quat;
+    tf2_broadcaster_.sendTransform(odom_tf);
+  }
 
   pose.position.x = x;
   pose.position.y = y;
