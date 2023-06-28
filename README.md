@@ -1,60 +1,65 @@
-# ypspur_ros_bridge
+# ypspur_ros2_bridge
 ## About
-This package provides the bridge to use ypspur with ROS.  
+This package provides the bridge to use ypspur with ROS 2.  
 With this package, you can send `cmd_vel` message and get `odom` message.
 
 ## Installation
 ### 1. git clone
 ```bash
-$ cd <catkin_ws>/src
-$ git clone https://github.com/RyodoTanaka/ypspur_ros_bridge.git
+$ cd <colcon_ws>/src
+$ git clone https://github.com/dlab-ut/ypspur_ros2_bridge.git
 ```
 
 ### 2. rosdep
 ```bash
-$ cd <catkin_ws>
-$ rosdep install -i -y -r --from-paths src --ignore-src
+$ cd <colcon_ws>
+$ rosdep install -i --from-paths src
 ```
 
 ### 3. build
 ```bash
-$ cd <catkin_ws>
-$ catkin_make
-$ source devel/setup.bash
+$ cd <colcon_ws>
+$ colcon build
+$ source install/local_setup.bash
 ```
 
 ## Usage
-### 1. start the ypspur
-First, you need to launch `ypspur-coordinator`.
-After connecting your PC and ypspur by mini-USB code, type follwing command.
+launch ypspur_ros_bridge
 ```bash
-$ cd <ypspur_ros_bridge>/script
-$ sudo sh ypspur_starter.sh
-```
-
-And you should see follwing messages, if it's succeeded.
-```bash
-++++++++++++++++++++++++++++++++++++++++++++++++++
-YamabicoProject-Spur
- Ver. 1.14.0
-++++++++++++++++++++++++++++++++++++++++++++++++++
-Device Information
- Port    : /dev/ttyACM0 
-Warn: Baudrate setting is not supported on this device.
-Applying parameters.
-YP-Spur coordinator started.
-Command analyzer started.
-Trajectory control loop started.
-```
-
-If you couldn't get such messages, insert your USB plug again.  
-After 10 seconds, try to start `ypspur-coordinator`.
-
-
-### 2. launch ypspur_ros_bridge
-```bash
-$ roslaunch ypspur_ros_bridge ypspur_ros_bridge.launch
+$ ros2 launch ypspur_ros2_bridge ypspur_ros2_bridge.launch.py
 ```
 
 See `ypspur_ros_bridge/launch/ypspur_ros_bridge.launch` file, for more detail.  
 And the parameter file is inside of `ypspur_ros_bridge/config/` directory.
+
+### Parameters
+
+```
+/**:
+  ros__parameters:
+    serial_port: "/dev/serial/by-id/usb-T-frog_project_T-frog_Driver-if00"
+    spur_params_file: "/home/tsukutsuku/tsukutsuku_ws/src/roboken/yp_robot_config/ypspur-robot-params/tsukutsuku.param"
+    spur_args: "--admask 10000000 --enable-get-digital-io"
+    frame_id: "odom"
+    child_frame_id: "base_link"
+    left_wheel_joint: "left_wheel_joint"
+    right_wheel_joint: "right_wheel_joint"
+    linear_vel_max: 2.0 #[m/s] 4[km/h] ~= 1.1[m/s]
+    linear_acc_max: 1.0 #[m/s]
+    angular_vel_max: 3.14 #[rad/s]
+    angular_acc_max: 3.14 #[rad/s]
+    pub_hz_: 50.0
+```
+### publish Topics
+
+#### joint_states(sensor_msgs::msg::JointState)
+Publish left/right wheel joint state
+so that this package is used with joint_state_publisher
+
+#### odom(nav_msgs::msg::Odometry)
+#### twist(geometry_msgs::msg::TwistStamped)
+#### pose(geometry_msgs::msg::PoseStamped)
+
+### subscribe Topics
+
+#### /cmd_vel(geometry_msgs::msg::Twist)
