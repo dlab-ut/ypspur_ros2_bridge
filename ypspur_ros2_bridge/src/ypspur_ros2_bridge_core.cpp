@@ -67,8 +67,9 @@ CallbackReturn YpspurROS2Bridge::on_configure(const rclcpp_lifecycle::State & pr
   Spur_set_angvel(angular_vel_max_);
   Spur_set_angaccel(angular_acc_max_);
 
-  js_.name.push_back(left_wheel_joint_);
-  js_.name.push_back(right_wheel_joint_);
+  js_.name.resize(2);
+  js_.name.at(0) = left_wheel_joint_;
+  js_.name.at(1) = right_wheel_joint_;
   js_.position.resize(2);
 
   double rate = 1.0 / pub_hz_;
