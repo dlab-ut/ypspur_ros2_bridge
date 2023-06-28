@@ -135,8 +135,11 @@ void YpspurROS2Bridge::timerCallback()
   geometry_msgs::msg::Quaternion odom_quat;
   geometry_msgs::msg::TransformStamped odom_trans;
   nav_msgs::msg::Odometry odom;
-  geometry_msgs::msg::TwistStamped twist;
-  geometry_msgs::msg::PoseStamped pose;
+  geometry_msgs::msg::TwistStamped twist_stamped;
+  geometry_msgs::msg::PoseStamped pose_stamped;
+  geometry_msgs::msg::Pose pose;
+  geometry_msgs::msg::Twist twist;
+  
   rclcpp::Clock ros_clock(RCL_ROS_TIME);
 
   double x, y, th;
@@ -160,32 +163,31 @@ void YpspurROS2Bridge::timerCallback()
   odom_trans.transform.translation.z = 0.0;
   odom_trans.transform.rotation = odom_quat;
 
+  pose.position.x = x;
+  pose.position.y = y;
+  pose.position.z = 0.0;
+  pose.orientation = odom_quat;
+
+  twist.linear.x = vx;
+  twist.linear.y = vy;
+  twist.angular.z = vth;
+
   odom.header.stamp = ros_clock.now();
   odom.header.frame_id = frame_id_;
   odom.child_frame_id = child_frame_id_;
-  odom.pose.pose.position.x = x;
-  odom.pose.pose.position.y = y;
-  odom.pose.pose.position.z = 0.0;
-  odom.pose.pose.orientation = odom_quat;
-
-  odom.twist.twist.linear.x = vx;
-  odom.twist.twist.linear.y = vy;
-  odom.twist.twist.angular.z = vth;
-
+  odom.pose.pose = pose;
+  odom.twist.twist = twist;
   odom_pub_->publish(odom);
 
-  twist.header.stamp = ros_clock.now();
-  twist.header.frame_id = child_frame_id_;
-  twist.twist.linear.x = vx;
-  twist.twist.linear.y = vy;
-  twist.twist.angular.z = vth;
-  twist_pub_->publish(twist);
+  twist_stamped.header.stamp = ros_clock.now();
+  twist_stamped.header.frame_id = child_frame_id_;
+  twist_stamped.twist = twist;
+  twist_pub_->publish(twist_stamped);
 
-  pose.header.stamp = ros_clock.now();
-  pose.header.frame_id = frame_id_;
-  pose.pose.position = odom.pose.pose.position;
-  pose.pose.orientation = odom.pose.pose.orientation;
-  pose_pub_->publish(pose);
+  pose_stamped.header.stamp = ros_clock.now();
+  pose_stamped.header.frame_id = frame_id_;
+  pose_stamped.pose = pose;
+  pose_pub_->publish(pose_stamped);
 
   js_.header.stamp = ros_clock.now();
   js_.position.at(0) = l_ang;
