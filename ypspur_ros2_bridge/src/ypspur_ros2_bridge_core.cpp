@@ -9,11 +9,11 @@ YpspurROS2Bridge::YpspurROS2Bridge()
 void YpspurROS2Bridge::declareParams()
 {
   serial_port_ = this->declare_parameter<std::string>("serial_port", "/dev/serial/by-id/usb-T-frog_project_T-frog_Driver-if00");
-  param_file_ = this->declare_parameter<std::string>("spur_params_file", "spur_params_file");
-  spur_args_ = this->declare_parameter<std::string>("spur_args", "spur_args");
-  left_wheel_joint_ = this->declare_parameter<std::string>("left_wheel_joint", "left_wheel_joint");
-  right_wheel_joint_ =
-    this->declare_parameter<std::string>("right_wheel_joint", "right_wheel_joint");
+  param_file_ = this->declare_parameter<std::string>("spur_params_file", "");
+  spur_args_ = this->declare_parameter<std::string>("spur_args", "");
+  left_wheel_joint_name_ = this->declare_parameter<std::string>("left_wheel_joint_name", "left_wheel_joint");
+  right_wheel_joint_name_ =
+    this->declare_parameter<std::string>("right_wheel_joint_name", "right_wheel_joint");
   frame_id_ = this->declare_parameter<std::string>("frame_id", "odom");
   child_frame_id_ = this->declare_parameter<std::string>("child_frame_id", "base_link");
   linear_vel_max_ = this->declare_parameter<double>("linear_vel_max", 1.1);
@@ -29,8 +29,8 @@ void YpspurROS2Bridge::getParams()
   this->get_parameter("serial_port", serial_port_);
   this->get_parameter("spur_params_file", param_file_);
   this->get_parameter("spur_args", spur_args_);
-  this->get_parameter("left_wheel_joint", left_wheel_joint_);
-  this->get_parameter("right_wheel_joint", right_wheel_joint_);
+  this->get_parameter("left_wheel_joint_name", left_wheel_joint_name_);
+  this->get_parameter("right_wheel_joint_name", right_wheel_joint_name_);
   this->get_parameter("frame_id", frame_id_);
   this->get_parameter("child_frame_id", child_frame_id_);
   this->get_parameter("linear_vel_max", linear_vel_max_);
@@ -70,8 +70,8 @@ CallbackReturn YpspurROS2Bridge::on_configure(const rclcpp_lifecycle::State & pr
   Spur_set_angaccel(angular_acc_max_);
 
   js_.name.resize(2);
-  js_.name.at(0) = left_wheel_joint_;
-  js_.name.at(1) = right_wheel_joint_;
+  js_.name.at(0) = left_wheel_joint_name_;
+  js_.name.at(1) = right_wheel_joint_name_;
   js_.position.resize(2);
 
   double rate = 1.0 / pub_hz_;

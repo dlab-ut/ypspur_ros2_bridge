@@ -52,8 +52,8 @@ private:
   bool use_odom_tf_;
   sensor_msgs::msg::JointState js_;
 
-  std::string left_wheel_joint_;
-  std::string right_wheel_joint_;
+  std::string left_wheel_joint_name_;
+  std::string right_wheel_joint_name_;
 
   std::string frame_id_;
   std::string child_frame_id_;
