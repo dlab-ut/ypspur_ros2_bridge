@@ -187,9 +187,7 @@ void YpspurROS2Bridge::timerCallback()
   pose_pub_->publish(pose);
 
   js_.header.stamp = ros_clock.now();
-  js_.name.push_back(left_wheel_joint_);
-  js_.name.push_back(right_wheel_joint_);
-  js_.position.push_back(l_ang);
-  js_.position.push_back(r_ang);
+  js_.position.at(0) = l_ang;
+  js_.position.at(1) = r_ang;
   js_pub_->publish(js_);
 }
