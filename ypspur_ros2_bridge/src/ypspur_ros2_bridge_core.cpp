@@ -124,6 +124,7 @@ CallbackReturn YpspurROS2Bridge::on_activate(const rclcpp_lifecycle::State & pre
     return CallbackReturn::SUCCESS;
   } else {
     RCLCPP_WARN(get_logger(), "Ypspur got some error states");
+    return CallbackReturn::FAILURE;
   }
 }
 
