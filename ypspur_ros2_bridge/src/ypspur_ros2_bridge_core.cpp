@@ -21,7 +21,7 @@ void YpspurROS2Bridge::declareParams()
   linear_acc_max_ = this->declare_parameter<double>("linear_acc_max", 1.0);
   angular_acc_max_ = this->declare_parameter<double>("angular_acc_max", M_PI);
   pub_hz_ = this->declare_parameter<double>("pub_hz_", 25.0);
-  use_odom_tf_ = this->declare_parameter<bool>("use_odom_tf", false);
+  use_odom_tf_ = this->declare_parameter<bool>("use_odom_tf", true);
 }
 
 void YpspurROS2Bridge::getParams()
