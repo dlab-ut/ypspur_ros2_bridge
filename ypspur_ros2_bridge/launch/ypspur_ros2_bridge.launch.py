@@ -33,7 +33,7 @@ def generate_launch_description():
         package="ypspur_ros2_bridge",
         executable="ypspur_ros2_bridge",
         output="screen",
-        parameters=[params_file]
+        parameters=[launch_ros.parameter_descriptions.ParameterFile(params_file, allow_substs=True)]
     )
 
     configure_trans_event = launch.actions.EmitEvent(
