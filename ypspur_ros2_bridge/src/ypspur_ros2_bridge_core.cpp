@@ -87,7 +87,7 @@ CallbackReturn YpspurROS2Bridge::on_configure(const rclcpp_lifecycle::State & pr
   cmd_vel_sub_ = this->create_subscription<geometry_msgs::msg::Twist>(
     "/cmd_vel", 1, std::bind(&YpspurROS2Bridge::CmdVelCallback, this, std::placeholders::_1));
   odom_pub_ = this->create_publisher<nav_msgs::msg::Odometry>("odom", rclcpp::QoS{10});
-  twist_pub_ = this->create_publisher<geometry_msgs::msg::TwistStamped>("twist", rclcpp::QoS{10});
+  twist_pub_ = this->create_publisher<geometry_msgs::msg::TwistWithCovarianceStamped>("twist", rclcpp::QoS{10});
   pose_pub_ = this->create_publisher<geometry_msgs::msg::PoseStamped>("pose", rclcpp::QoS{10});
   js_pub_ = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", rclcpp::QoS{10});
 
@@ -138,7 +138,7 @@ void YpspurROS2Bridge::timerCallback()
   geometry_msgs::msg::Quaternion odom_quat;
   geometry_msgs::msg::TransformStamped odom_tf;
   nav_msgs::msg::Odometry odom;
-  geometry_msgs::msg::TwistStamped twist_stamped;
+  geometry_msgs::msg::TwistWithCovarianceStamped twist_stamped;
   geometry_msgs::msg::PoseStamped pose_stamped;
   geometry_msgs::msg::Pose pose;
   geometry_msgs::msg::Twist twist;
@@ -187,7 +187,13 @@ void YpspurROS2Bridge::timerCallback()
 
   twist_stamped.header.stamp = ros_clock.now();
   twist_stamped.header.frame_id = child_frame_id_;
-  twist_stamped.twist = twist;
+  twist_stamped.twist.twist = twist;
+  twist_stamped.twist.covariance[0] = 1.0;
+  twist_stamped.twist.covariance[7] = 1.0;
+  twist_stamped.twist.covariance[14] = 1.0;
+  twist_stamped.twist.covariance[21] = 1.0;
+  twist_stamped.twist.covariance[28] = 1.0;
+  twist_stamped.twist.covariance[35] = 1.0;
   twist_pub_->publish(twist_stamped);
 
   pose_stamped.header.stamp = ros_clock.now();
