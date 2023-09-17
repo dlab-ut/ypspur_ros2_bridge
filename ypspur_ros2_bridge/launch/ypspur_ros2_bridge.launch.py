@@ -33,7 +33,10 @@ def generate_launch_description():
         package="ypspur_ros2_bridge",
         executable="ypspur_ros2_bridge",
         output="screen",
-        parameters=[launch_ros.parameter_descriptions.ParameterFile(params_file, allow_substs=True)]
+        parameters=[launch_ros.parameter_descriptions.ParameterFile(params_file, allow_substs=True)],
+        remappings=[
+            ("twist", LaunchConfiguration("twist_topic", default="twist")),
+        ]
     )
 
     configure_trans_event = launch.actions.EmitEvent(
